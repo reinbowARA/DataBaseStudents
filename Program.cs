@@ -2,12 +2,19 @@
 using static System.Console;
 
 // проверить или создать xls файл
-Workbook wb = new Workbook("Students.xls");
+String? NameFileXLS = "Students.xls";
+Workbook wb = new Workbook(NameFileXLS);
 int countSheet = wb.Worksheets.Count;
 int cheek = 0;
 int n;
+//DeleteWarning();
+try
+{
 do
 {
+    
+    wb.Save(NameFileXLS);
+    
     WriteLine("------MENU------");
     WriteLine("1 - Создать группу");
     WriteLine("2 - Удалить группу");
@@ -22,7 +29,7 @@ do
     {
         case 1:
             String? GroopName = ReadLine();
-            for (int i = 0; i < countSheet; i++)
+            /*for (int i = 0; i < countSheet; i++)
             {
                 if(GroopName == wb.Worksheets[i].Name)
                 {
@@ -30,37 +37,32 @@ do
                     cheek++;
                     break;
                 }
-            }
+            }*/
             if (cheek == 0)
             {
                 Worksheet sheet = wb.Worksheets.Add(GroopName);
                 WriteLine("Группа создана");
             }
-            wb.Save("Students.xls");
+            //wb.Save(NameFileXLS);
             break;
         case 2:
             GroopName = ReadLine();
-            for (int i = 0; i < countSheet; i++)
+            if (GroopName == wb.Worksheets[GroopName].Name)
             {
-                if (GroopName == wb.Worksheets[i].Name)
-                {
-                    wb.Worksheets.RemoveAt(GroopName);
-                    WriteLine("Группа удаленна");
-                    cheek++;
-                    break;
-                }
-            }               
-            if (cheek == 0)
-            {
-                WriteLine("нет такой группы");
-            }  
-            wb.Save("Students.xls");         
+                wb.Worksheets.RemoveAt(GroopName);
+                WriteLine("Группа удаленна");
+                cheek++;
+                break;
+            }              
+            //wb.Save(NameFileXLS);         
             break;
         case 3:
-            for (int i = 0; i < countSheet; i++)
+            try{
+                for (int i = 0; i < countSheet; i++)
             {
                 WriteLine(wb.Worksheets[i].Name);
             }
+            }catch(System.ArgumentOutOfRangeException){WriteLine("Ошибка: выход индекса за предела");}
             break;
         case 4:
             GroopName = ReadLine();
@@ -68,7 +70,7 @@ do
             String? NameStudent;
             for (int j = 0; j < 30; j++)
             {
-                Write($"{j} - Введите имя студента: ");
+                Write($"{j+1} - Введите имя студента: ");
                 NameStudent = ReadLine();
                 cell = wb.Worksheets[GroopName].Cells[j,0];
                 cell.PutValue(NameStudent);
@@ -78,11 +80,12 @@ do
                     break;
                 }
             }
-            wb.Save("Students.xls");
+            AutoSort(GroopName);
+            //wb.Save(NameFileXLS);
             break;
         case 5:
             GroopName = ReadLine();
-            AutoSort(GroopName);
+            //AutoSort(GroopName);
             for (int j = 0; j < 30; j++)
             {
                 cell = wb.Worksheets[GroopName].Cells[j,0];
@@ -91,7 +94,7 @@ do
                     break;
                 }
             }
-            wb.Save("Students.xls");
+            //wb.Save(NameFileXLS);
             break;
         case 6:
             GroopName = ReadLine();
@@ -103,35 +106,33 @@ do
                 {
                     cell.PutValue("");
                 }
-                if(cell.StringValue.Length == 0){
+                if(cell.StringValue.Length == 0 || cell.StringValue == null){
                     break;
                 }
             }
             AutoSort(GroopName);
             wb.Worksheets[GroopName].Cells.DeleteBlankRows();
-            wb.Save("Students.xls");
+           // wb.Save(NameFileXLS);
             break;
         default:
             break;
     }
+
 } while (n != 0);
-
-for (int i = 0; i <= wb.Worksheets.Count; i++)
-{
-    if (i == 0)
-    {
-        wb.Worksheets.RemoveAt("Evaluation Warning");
-    }
-    wb.Worksheets.RemoveAt($"Evaluation Warning ({i})");
 }
-wb.Save("Students.xls");
+catch (System.Exception)
+{
+    WriteLine("Опять ваш SkiaSharp");
+}
+DeleteWarning();
+//wb.Save(NameFileXLS);
 
-static void AutoSort(string? GroopName){
-    var wb = new Workbook("Students.xls");
+void AutoSort(string? GroopName){
+   // var wb = new Workbook();
     DataSorter sorter = wb.DataSorter;
     sorter.Order1 = SortOrder.Ascending;
     sorter.Key1 = 0;
-    sorter.Order2 =SortOrder.Descending;
+    sorter.Order2 = SortOrder.Descending;
     sorter.Key2 = 1;
     CellArea ca = new CellArea();
     ca.StartRow = 0;
@@ -140,4 +141,16 @@ static void AutoSort(string? GroopName){
     ca.EndColumn = 0;
     sorter.Sort(wb.Worksheets[GroopName].Cells, ca);
     wb.Worksheets[GroopName].Cells.DeleteBlankRows();
+}
+
+void DeleteWarning(){
+   // String value = "Evaluation Warning";
+    for (int i = 0; i <= wb.Worksheets.Count; i++)// deleted sheet evaluatin warning
+    {
+        if (wb.Worksheets[i].Name.Length > 10)
+        {
+            wb.Worksheets.RemoveAt(wb.Worksheets[i].Name);
+        }
+       // wb.Worksheets.RemoveAt(value.Contains("Warning")&&value.Contains("Evaluation")?1:0);
+    }
 }
