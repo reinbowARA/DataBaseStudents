@@ -124,7 +124,7 @@ do
 
 } while (n != 0);
 
-//try{DeleteWarning();}catch(Exception ex){WriteLine(ex.ToString() + "Error here 127");};
+//try{DeleteWarning();}catch(Exception ex){WriteLine(ex.ToString() + "Error here 127");};// он чет здесь ругается
 wb.Save(NameFileXLS);
 
 void AutoSort(string? GroopName){
@@ -143,7 +143,7 @@ void AutoSort(string? GroopName){
     wb.Worksheets[GroopName].Cells.DeleteBlankRows();
 }
 
-void DeleteWarning(){
+/*void DeleteWarning(){
    // String value = "Evaluation Warning";
     for (int i = 0; i <= wb.Worksheets.Count; i++)// deleted sheet evaluatin warning
     {
@@ -153,4 +153,4 @@ void DeleteWarning(){
         }
        // wb.Worksheets.RemoveAt(value.Contains("Warning")&&value.Contains("Evaluation")?1:0);
     }
-}
+}*/
