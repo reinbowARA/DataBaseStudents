@@ -8,12 +8,10 @@ int countSheet = wb.Worksheets.Count;
 int cheek = 0;
 int n;
 //DeleteWarning();
-try
-{
+
 do
 {
-    
-    wb.Save(NameFileXLS);
+    //wb.Save(NameFileXLS);
     
     WriteLine("------MENU------");
     WriteLine("1 - Создать группу");
@@ -24,7 +22,9 @@ do
     WriteLine("6 - Удаление студента из группы");
     WriteLine("0 - exit");
     
+
     n = Convert.ToInt32(ReadLine());
+    try{
     switch (n)
     {
         case 1:
@@ -63,6 +63,7 @@ do
                 WriteLine(wb.Worksheets[i].Name);
             }
             }catch(System.ArgumentOutOfRangeException){WriteLine("Ошибка: выход индекса за предела");}
+            catch(System.TypeInitializationException){WriteLine("Непонятная ошибка");}
             break;
         case 4:
             GroopName = ReadLine();
@@ -116,16 +117,15 @@ do
             break;
         default:
             break;
+    }}
+    catch(Exception ex){
+        WriteLine(ex.ToString());
     }
 
 } while (n != 0);
-}
-catch (System.Exception)
-{
-    WriteLine("Опять ваш SkiaSharp");
-}
-DeleteWarning();
-//wb.Save(NameFileXLS);
+
+//try{DeleteWarning();}catch(Exception ex){WriteLine(ex.ToString() + "Error here 127");};
+wb.Save(NameFileXLS);
 
 void AutoSort(string? GroopName){
    // var wb = new Workbook();
