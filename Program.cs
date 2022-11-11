@@ -2,7 +2,7 @@
 using static System.Console;
 
 // проверить или создать xls файл
-String? NameFileXLS = "Students.xls";
+String NameFileXLS = "Students.xls";
 Workbook wb = new Workbook(NameFileXLS);
 int countSheet = wb.Worksheets.Count;
 int cheek = 0;
@@ -20,32 +20,23 @@ do
     WriteLine("4 - Добавить студента/студентов в группу");
     WriteLine("5 - Состав группы");
     WriteLine("6 - Удаление студента из группы");
+    WriteLine("7 - Создание потока");
+    WriteLine("8 - сортировка по ФИО/Группам");
+    WriteLine("9 - Save in exl");
     WriteLine("0 - exit");
     
 
     n = Convert.ToInt32(ReadLine());
-    try{
     switch (n)
     {
         case 1:
-            String? GroopName = ReadLine();
-            /*for (int i = 0; i < countSheet; i++)
-            {
-                if(GroopName == wb.Worksheets[i].Name)
-                {
-                    WriteLine("Такая группа уже существует");
-                    cheek++;
-                    break;
-                }
-            }*/
-            if (cheek == 0)
-            {
-                Worksheet sheet = wb.Worksheets.Add(GroopName);
-                WriteLine("Группа создана");
-            }
-            //wb.Save(NameFileXLS);
+            Write("Введите название группы: ");
+            String GroopName = ReadLine();
+            Worksheet sheet = wb.Worksheets.Add(GroopName);
+            WriteLine("Группа создана");
             break;
         case 2:
+            Write("Введите название группы: ");
             GroopName = ReadLine();
             if (GroopName == wb.Worksheets[GroopName].Name)
             {
@@ -66,9 +57,10 @@ do
             catch(System.TypeInitializationException){WriteLine("Непонятная ошибка");}
             break;
         case 4:
+            Write("Введите название группы: ");
             GroopName = ReadLine();
             Cell cell;
-            String? NameStudent;
+            String NameStudent;
             for (int j = 0; j < 30; j++)
             {
                 Write($"{j+1} - Введите имя студента: ");
@@ -81,12 +73,13 @@ do
                     break;
                 }
             }
-            AutoSort(GroopName);
+            AutoSortName(GroopName,30);
             //wb.Save(NameFileXLS);
             break;
         case 5:
+            Write("Введите название группы: ");
             GroopName = ReadLine();
-            //AutoSort(GroopName);
+            //AutoSortName(GroopName);
             for (int j = 0; j < 30; j++)
             {
                 cell = wb.Worksheets[GroopName].Cells[j,0];
@@ -98,7 +91,9 @@ do
             //wb.Save(NameFileXLS);
             break;
         case 6:
+            Write("Введите название группы: ");
             GroopName = ReadLine();
+            Write("Введите ФИО студента: ");
             NameStudent = ReadLine();
             for (int j = 0; j < 30; j++)
             {
@@ -111,23 +106,64 @@ do
                     break;
                 }
             }
-            AutoSort(GroopName);
+            AutoSortName(GroopName,30);
             wb.Worksheets[GroopName].Cells.DeleteBlankRows();
            // wb.Save(NameFileXLS);
             break;
+        case 7:
+            Write("Введите название потока без года: ");
+            String ThreadName = ReadLine();
+            Write("Введите год потока: ");
+            String EarsThread = ReadLine();
+            String thread = ThreadName+"-"+EarsThread;
+            int count = 0;
+            int addcell = 0;
+            try{wb.Worksheets.Add(thread);}catch(Aspose.Cells.CellsException){WriteLine("Данный поток уже существует");}
+            for (int i = 0; i < countSheet; i++)
+            {
+                if(wb.Worksheets[i].Name.StartsWith(ThreadName) && wb.Worksheets[i].Name.EndsWith(EarsThread)){count++;}
+            }
+            WriteLine(count);
+            for (int i = 0; i < countSheet; i++)
+            {
+                if(wb.Worksheets[i].Name.StartsWith(ThreadName) && wb.Worksheets[i].Name.EndsWith(EarsThread) && (wb.Worksheets[i].Name.Length == 10))
+                {
+                    String name = wb.Worksheets[i].Name;
+                    for (int j = 0; j <= wb.Worksheets[i].Cells.MaxDataRow; j++)
+                    {
+                        var cellname = wb.Worksheets[name].Cells[j,0].StringValue;
+                        wb.Worksheets[thread].Cells[j+addcell,0].PutValue(cellname); 
+                        wb.Worksheets[thread].Cells[j+addcell,1].PutValue(name);
+                    }
+                    addcell = addcell + wb.Worksheets[i].Cells.MaxDataRow+1;
+                }
+            }            
+            break;
+        case 8:
+            GroopName = ReadLine();
+            int countrow = wb.Worksheets[GroopName].Cells.MaxDataRow;
+          /*  while (wb.Worksheets[GroopName].Cells[countinrow,0] != null)
+            {
+                countinrow++;
+                countallrow++;
+            }*/
+            Write("Вы желаете отсортировать поток по Алфваиту ФИО или по группам (1 - по ФИО, 2 - по группам, enter - оставить без изменений): ");
+            int s = Int32.Parse(ReadLine());
+            if(s == 1){AutoSortName(GroopName,countrow);}else if(s == 2){AutoSortGrooup(GroopName,countrow);}else{WriteLine("ну лан");}
+            break;
+        case 9:
+            try{wb.Save(NameFileXLS);}catch(Exception){WriteLine("Error save");}
+            break;
         default:
             break;
-    }}
-    catch(Exception ex){
-        WriteLine(ex.ToString());
     }
 
 } while (n != 0);
 
 //try{DeleteWarning();}catch(Exception ex){WriteLine(ex.ToString() + "Error here 127");};// он чет здесь ругается
-wb.Save(NameFileXLS);
+//wb.Save(NameFileXLS);
 
-void AutoSort(string? GroopName){
+void AutoSortName(string GroopName,int MaxRow){
    // var wb = new Workbook();
     DataSorter sorter = wb.DataSorter;
     sorter.Order1 = SortOrder.Ascending;
@@ -135,22 +171,24 @@ void AutoSort(string? GroopName){
     sorter.Order2 = SortOrder.Descending;
     sorter.Key2 = 1;
     CellArea ca = new CellArea();
-    ca.StartRow = 0;
-    ca.StartColumn = 0;
-    ca.EndRow = 29;
-    ca.EndColumn = 0;
+    ca.StartRow = 0;// start in first row
+    ca.StartColumn = 0;// start in first column
+    ca.EndRow = MaxRow; // end in 30+ Row
+    ca.EndColumn = 1;//как были в одной колонке так и остались
     sorter.Sort(wb.Worksheets[GroopName].Cells, ca);
     wb.Worksheets[GroopName].Cells.DeleteBlankRows();
 }
-
-/*void DeleteWarning(){
-   // String value = "Evaluation Warning";
-    for (int i = 0; i <= wb.Worksheets.Count; i++)// deleted sheet evaluatin warning
-    {
-        if (wb.Worksheets[i].Name.Length > 10)
-        {
-            wb.Worksheets.RemoveAt(wb.Worksheets[i].Name);
-        }
-       // wb.Worksheets.RemoveAt(value.Contains("Warning")&&value.Contains("Evaluation")?1:0);
-    }
-}*/
+void AutoSortGrooup(string GroopName, int MaxRow){
+    DataSorter sorter = wb.DataSorter;
+    sorter.Order1 = SortOrder.Ascending;
+    sorter.Key1 = 1;
+    sorter.Order2 = SortOrder.Ascending;
+    sorter.Key2 = 0;
+    CellArea ca = new CellArea();
+    ca.StartRow = 0;
+    ca.StartColumn = 0;
+    ca.EndRow = MaxRow;
+    ca.EndColumn = 1;
+    sorter.Sort(wb.Worksheets[GroopName].Cells, ca);
+    wb.Worksheets[GroopName].Cells.DeleteBlankRows();
+}
