@@ -156,14 +156,17 @@ do
             }            
             break;
         case 8:
+            Write("Введите название группы / потока: ");
             GroopName = ReadLine();
             int countrow = wb.Worksheets[GroopName].Cells.MaxDataRow;
             Write("Вы желаете отсортировать поток по Алфваиту ФИО или по группам (1 - по ФИО, 2 - по группам, enter - оставить без изменений): ");
             int s = Int32.Parse(ReadLine());
-            if(s == 1){AutoSortName(GroopName,countrow);}else if(s == 2){AutoSortGrooup(GroopName,countrow);}else{WriteLine("ну лан");}
+            try{if(s == 1){AutoSortName(GroopName,countrow);}else if(s == 2){AutoSortGrooup(GroopName,countrow);}else{WriteLine("ну лан");}}
+            catch(System.FormatException){WriteLine("ну ни хочешь, как хочешь");}
             break;
         case 9:
-            try{wb.Save(NameFileXLS);}catch(Exception){WriteLine("Error save");}
+            try{wb.Save(NameFileXLS);}catch(Exception){WriteLine("Error save");break;}
+            WriteLine("Сохранение успешно!");
             break;
         default:
             break;
