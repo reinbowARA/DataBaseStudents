@@ -21,9 +21,10 @@ do
     WriteLine("8 - сортировка по ФИО/Группам");
     WriteLine("9 - Save in exl");
     WriteLine("0 - exit");
-    
-
+ret:  
+    WriteLine("Введите число: ");
     n = Convert.ToInt32(ReadLine());
+    if(n > 9){goto ret;}
     switch (n)
     {
         case 1:
