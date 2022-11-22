@@ -27,15 +27,26 @@ do
     switch (n)
     {
         case 1:
-            Write("Введите название группы вида  ####-##-##: ");
+            Write("Введите название группы вида  ББББ-ЦЦ-ЦЦ (Б - буква, Ц - цифра): ");
             String GroopName = ReadLine();
             GroopName.ToUpper();
+            if(!ChekerGroop(GroopName))
+            {
+                WriteLine("Формат записи не верный");
+                goto case 1;
+            }
             try{wb.Worksheets.Add($"{GroopName: ####-##-##}");}catch(Aspose.Cells.CellsException){WriteLine("Группа уже существует");break;}
             WriteLine("Группа создана");
             break;
         case 2:
             Write("Введите полное название группы: ");
             GroopName = ReadLine();
+            GroopName.ToUpper();
+            if(!ChekerGroop(GroopName))
+            {
+                WriteLine("Формат записи не верный");
+                goto case 2;
+            }
             if (GroopName == wb.Worksheets[GroopName].Name)
             {
                 wb.Worksheets.RemoveAt(GroopName);
@@ -62,6 +73,12 @@ do
         case 4:
             Write("Введите название группы: ");
             GroopName = ReadLine();
+            GroopName.ToUpper();
+            if(!ChekerGroop(GroopName))
+            {
+                WriteLine("Формат записи не верный");
+                goto case 4;
+            }
             Cell cell;
             String NameStudent;
             for (int j = 0; j < 30; j++)
@@ -80,6 +97,10 @@ do
         case 5:
             Write("Введите название группы / потока: ");
             GroopName = ReadLine();
+            GroopName.ToUpper();
+
+            try{var exist = wb.Worksheets[GroopName].Name;}catch(System.NullReferenceException){WriteLine("Группы / потока не существует"); goto case 5;}
+
             for (int j = 0; j <= wb.Worksheets[GroopName].Cells.MaxDataRow; j++)
             {   if(wb.Worksheets[GroopName].Cells.MaxDataRow > 30){
                     var cell1 = wb.Worksheets[GroopName].Cells[j,0];
@@ -109,28 +130,60 @@ do
         case 6:
             Write("Введите название группы: ");
             GroopName = ReadLine();
+            if(GroopName.Length < 10){WriteLine("Неверна задана группа"); goto case 6;}
+            try{var exist = wb.Worksheets[GroopName].Name;}catch(System.NullReferenceException){WriteLine("Группы не существует"); goto case 6;}
             Write("Введите ФИО студента: ");
             NameStudent = ReadLine();
+            int chekers = 0;
             for (int j = 0; j < 30; j++)
             {
                 cell = wb.Worksheets[GroopName].Cells[j,0];
                 if (NameStudent == cell.StringValue)
                 {
                     cell.PutValue("");
+                    chekers++;
                 }
                 if(cell.StringValue.Length == 0 || cell.StringValue == null){
                     break;
                 }
             }
+            if(chekers == 0){WriteLine($"Студента {NameStudent} нету в списке");break;}
             AutoSortName(GroopName,30);
             wb.Worksheets[GroopName].Cells.DeleteBlankRows();
            // wb.Save(NameFileXLS);
             break;
         case 7:
-            Write("Введите название потока без года: ");
+            Write("Введите название потока без года формата ББББ: ");
             String ThreadName = ReadLine();
+            ThreadName.ToUpper();
+            if(ThreadName.Length != 4)
+            {
+                WriteLine("Неверный формат записи названия потока");
+                goto case 7;
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                if(!char.IsLetter(ThreadName[i]))
+                {
+                    WriteLine("Неверный формат записи названия потока"); 
+                    goto case 7;
+                }
+            }
             Write("Введите год потока: ");
             String EarsThread = ReadLine();
+            if(EarsThread.Length != 2)
+            {
+                WriteLine("Неверный формат записи года потока");
+                goto case 7;
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                if(!char.IsNumber(EarsThread[i]))
+                {
+                    WriteLine("Неверный формат записи года потока"); 
+                    goto case 7;
+                }
+            }
             String thread = ThreadName+"-"+EarsThread;
             int count = 0;
             int addcell = 0;
@@ -158,6 +211,8 @@ do
         case 8:
             Write("Введите название группы / потока: ");
             GroopName = ReadLine();
+            GroopName.ToUpper();
+            try{var exist = wb.Worksheets[GroopName].Name;}catch(System.NullReferenceException){WriteLine("Группы не существует"); goto case 6;}
             int countrow = wb.Worksheets[GroopName].Cells.MaxDataRow;
             Write("Вы желаете отсортировать поток по Алфваиту ФИО или по группам (1 - по ФИО, 2 - по группам, enter - оставить без изменений): ");
             int s = Int32.Parse(ReadLine());
@@ -174,8 +229,25 @@ do
 
 } while (n != 0);
 
-//try{DeleteWarning();}catch(Exception ex){WriteLine(ex.ToString() + "Error here 127");};// он чет здесь ругается
-//wb.Save(NameFileXLS);
+bool ChekerGroop(string groopName)
+{
+    if(groopName.Length > 10){return false;}
+    for (int i = 0; i < 4; i++)
+    {
+        if(!char.IsLetter(groopName[i]))
+        {
+            return false; 
+            //break;
+        }
+    }
+    if(groopName[4] != '-' || groopName[7] != '-'){return false;}
+    if(char.IsNumber(groopName[5]) 
+        && (char.IsNumber(groopName[6]) && groopName[6] != '0') 
+        && char.IsNumber(groopName[8]) 
+        && (char.IsNumber(groopName[9]) && groopName[9] != '0'))
+    {return true;}
+    else{return false;}
+}
 
 void AutoSortName(string GroopName,int MaxRow){
    // var wb = new Workbook();
