@@ -13,7 +13,7 @@ Menu:
     WriteLine("------MENU------");
     WriteLine("1 - Создать группу");
     WriteLine("2 - Удалить группу");
-    WriteLine("3 - Список групп");;
+    WriteLine("3 - Список групп");
     WriteLine("4 - Добавить студента/студентов в группу");
     WriteLine("5 - Состав группы / потока");
     WriteLine("6 - Удаление студента из группы");
@@ -99,7 +99,15 @@ do
             String NameStudent;
             for (int j = 0; j < 30; j++)
             {
-                student:
+                if (wb.Worksheets[GroopName].Cells.MaxDataRow-1 != 0)
+                {
+                    j = wb.Worksheets[GroopName].Cells.MaxDataRow+1;
+                    if(j > 29){
+                        WriteLine("В группе уже 30 студентов");
+                        break;
+                    }
+                }
+            student:
                 Write($"{j+1} - Введите имя студента: ");
                 NameStudent = ReadLine();
                 if (CheckName(NameStudent) == false)
@@ -116,6 +124,7 @@ do
                     goto Menu;
                 }
             }
+            AutoSortName(GroopName,30);
             wb.Worksheets[GroopName].Cells.DeleteBlankRows();
             goto Menu;
         case 5:
@@ -155,25 +164,14 @@ do
             GroopName = ReadLine();
             if(GroopName.Length < 10){WriteLine("Неверна задана группа"); goto case 6;}
             try{var exist = wb.Worksheets[GroopName].Name;}catch(System.NullReferenceException){WriteLine("Группы не существует"); goto case 6;}
-            Write("Введите ФИО студента: ");
-            NameStudent = ReadLine();
-            int chekers = 0;
-            for (int j = 0; j < 30; j++)
-            {
-                cell = wb.Worksheets[GroopName].Cells[j,0];
-                if (NameStudent == cell.StringValue)
-                {
-                    cell.PutValue("");
-                    chekers++;
-                }
-                if(cell.StringValue.Length == 0 || cell.StringValue == null){
-                    goto Menu;
-                }
+            Write("Введите номер студента из его списка групп: ");
+            int NameStudentNum = Convert.ToInt32(ReadLine());
+            if(NameStudentNum > 30){
+                WriteLine("В группе максимум 30 студентов");
+                goto case 6;
             }
-            if(chekers == 0){WriteLine($"Студента {NameStudent} нету в списке");goto Menu;}
-            AutoSortName(GroopName,30);
+            wb.Worksheets[GroopName].Cells.DeleteRow(NameStudentNum-1);
             wb.Worksheets[GroopName].Cells.DeleteBlankRows();
-           
             goto Menu;
         case 7:
             Write("Введите название потока без года формата ББББ: ");
@@ -312,9 +310,10 @@ void AutoSortGrooup(string GroopName, int MaxRow){
     wb.Worksheets[GroopName].Cells.DeleteBlankRows();
 }
 bool CheckName(String StudentName){
+    StudentName.Split(" ");
     foreach (char word in StudentName)
     {
-        if(!char.IsLetter(word)){
+        if(char.IsNumber(word)){
             return false;
         }
     }
