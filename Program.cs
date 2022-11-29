@@ -58,16 +58,11 @@ do
                 WriteLine("Формат записи не верный");
                 goto case 2;
             }
-            if (GroopName == wb.Worksheets[GroopName].Name)
-            {
+                try{GroopName = wb.Worksheets[GroopName].Name;}catch(Exception){WriteLine("Данной группы не существует"); goto case 2;}
                 wb.Worksheets.RemoveAt(GroopName);
                 WriteLine("Группа удаленна");
                 cheek++;
                 goto Menu;
-            }else{
-                WriteLine("Данной группы нету в списке");
-                goto Menu;
-            }                     
         case 3:
             try{
                 WriteLine("{0,-2} | {1}","ID", "Группы / Потоки");
@@ -269,7 +264,7 @@ do
 
 bool ChekerGroop(string groopName)
 {
-    if(groopName.Length > 10){return false;}
+    if(groopName.Length != 10){return false;}
     for (int i = 0; i < 4; i++)
     {
         if(!char.IsLetter(groopName[i]))
