@@ -281,12 +281,9 @@ bool ChekerGroop(string groopName)
 }
 
 void AutoSortName(string GroopName,int MaxRow){
-   // var wb = new Workbook();
     DataSorter sorter = wb.DataSorter;
     sorter.Order1 = SortOrder.Ascending;
     sorter.Key1 = 0;
-    sorter.Order2 = SortOrder.Descending;
-    sorter.Key2 = 1;
     CellArea ca = new CellArea();
     ca.StartRow = 0;// start in first row
     ca.StartColumn = 0;// start in first column
@@ -299,8 +296,6 @@ void AutoSortGrooup(string GroopName, int MaxRow){
     DataSorter sorter = wb.DataSorter;
     sorter.Order1 = SortOrder.Ascending;
     sorter.Key1 = 1;
-    sorter.Order2 = SortOrder.Ascending;
-    sorter.Key2 = 0;
     CellArea ca = new CellArea();
     ca.StartRow = 0;
     ca.StartColumn = 0;
